@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📦 Stock Clerk Dashboard - Pearl Land Commodities (Complete)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-brown: #8B4513;
+            --secondary-brown: #A0522D;
+            --primary-orange: #D2691E;
+            --secondary-orange: #FF8C00;
+            --cream: #FFF5E6;
+            --white: #ffffff;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --info: #3498db;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--cream) 0%, #fff 100%);
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--primary-brown);
+            color: var(--white);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--secondary-orange);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: var(--secondary-brown);
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu .icon {
+            font-size: 20px;
+            width: 30px;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .sidebar-footer a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin-top: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+        }
+
+        /* Header */
+        .content-header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 6px solid var(--primary-orange);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .content-header h1 {
+            color: var(--primary-brown);
+            font-size: 24px;
+        }
+
+        .role-badge {
+            background: var(--primary-brown);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s;
+            border-bottom: 4px solid var(--primary-orange);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 40px;
+            width: 70px;
+            height: 70px;
+            background: var(--cream);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-details h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .stat-number {
+            color: var(--primary-brown);
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            background: white;
+            border: 2px solid var(--primary-orange);
+            border-radius: 30px;
+            color: var(--primary-brown);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-brown);
+            border-color: var(--primary-brown);
+            color: white;
+        }
+
+        .tab-btn:hover {
+            background: var(--secondary-brown);
+            border-color: var(--secondary-brown);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table thead {
+            background: var(--primary-brown);
+            color: white;
+        }
+
+        .data-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--cream);
+        }
+
+        /* Delivery Status Grid */
+        .delivery-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin: 20px 0 25px;
+        }
+
+        .delivery-status-card {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 14px;
+            padding: 18px 20px;
+            text-align: center;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .delivery-status-card h3 {
+            margin: 0;
+            font-size: 13px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .delivery-status-card p {
+            margin: 10px 0 0;
+            font-size: 34px;
+            font-weight: 700;
+            color: var(--primary-brown);
+        }
+
+        /* Badges */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .badge-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .badge-info {
+            background: var(--info);
+            color: white;
+        }
+
+        /* Status Select Dropdown */
+        .status-select {
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            font-size: 0.8em;
+            background: white;
+        }
+
+        .status-select.pending {
+            background: #fff3cd;
+        }
+
+        .status-select.shipped {
+            background: #cce5ff;
+        }
+
+        .status-select.delivered {
+            background: #d4edda;
+        }
+
+        /* Buttons */
+        .btn-secondary {
+            background: var(--primary-orange);
+            color: white;
+            padding: 6px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            margin: 2px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary-orange);
+            transform: scale(1.05);
+        }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+            transform: scale(1.05);
+        }
+
+        .btn-approve {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        .btn-reject {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 2px;
+        }
+
+        /* Forms */
+        .product-form {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 6px solid var(--success);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--primary-brown);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0d5cc;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+        }
+
+        /* Alerts Section */
+        .alerts-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .alerts-section h2 {
+            color: var(--primary-brown);
+            margin-bottom: 15px;
+            border-bottom: 2px dashed var(--primary-orange);
+            padding-bottom: 10px;
+        }
+
+        .alert-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stock-critical {
+            color: var(--danger);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.8em;
+        }
+
+        /* Contact Button */
+        .btn-contact {
+            background: #3498db;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .btn-contact:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>🌶️ Pearl Land</h2>
+                <p>Stock Management</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a onclick="showTab('overview')"><span class="icon">🏠</span> Dashboard</a></li>
+                <li><a onclick="showTab('products')"><span class="icon">📦</span> Products</a></li>
+                <li><a onclick="showTab('rawmaterial')"><span class="icon">🌾</span> Raw Material</a></li>
+                <li><a onclick="showTab('alerts')"><span class="icon">⚠️</span> Reorder Alerts</a></li>
+                <li><a onclick="showTab('stockreport')"><span class="icon">📈</span> Stock Report</a></li>
+                <li><a onclick="showTab('delivery')"><span class="icon">🚚</span> Delivery</a></li>
+                <li><a onclick="showTab('fastslow')"><span class="icon">⚡</span> Fast/Slow Items</a></li>
+                <li><a onclick="showTab('returns')"><span class="icon">🔄</span> Return Report</a></li>
+                <li><a onclick="showTab('suppliers')"><span class="icon">🏭</span> Active Suppliers</a></li>
+                <li><a onclick="showTab('supplier-flow')"><span class="icon">📦</span> Supplier Sample Flow</a></li>
+                <li><a href="managerdashboard.html"><span class="icon">👑</span> Manager Dashboard</a></li>
+                <li><a href="linkeddashboard.html"><span class="icon">🔗</span> Linked Dashboard</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <div>📦 Stock Clerk</div>
+                <div style="font-size:12px;">account@pearlland.com</div>
+                <a href="index.html">🚪 Logout</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <h1>Stock Clerk Dashboard</h1>
+                <div class="role-badge">📦 Stock Management</div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid" id="stats-summary"></div>
+
+
+
+            <!-- Tab 1: Overview -->
+            <div id="tab-overview" class="tab-content active">
+                <div class="alerts-section">
+                    <h2>⚠️ Critical Stock Alerts</h2>
+                    <div id="critical-alerts-list"></div>
+                </div>
+                <div class="alerts-section">
+                    <h2>📋 Low Stock Items</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Current Stock</th>
+                                <th>Reorder Level</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="low-stock-body"></tbody>
+                    </table>
+                </div>
+                <div class="alerts-section">
+                    <h2>📜 Recent Stock Updates</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Product</th>
+                                <th>Type</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-movements"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 2: Products -->
+            <div id="tab-products" class="tab-content">
+                <div class="product-form">
+                    <h2 style="color: var(--primary-brown); margin-bottom: 20px;">➕ Add New Product</h2>
+                    <div class="form-row">
+                        <div class="form-group"><label>Product Name</label><input type="text" id="product-name"
+                                placeholder="e.g., Turmeric Powder"></div>
+                        <div class="form-group"><label>Category</label><select id="product-category">
+                                <option value="Spice">Spice</option>
+                                <option value="Whole Spice">Whole Spice</option>
+                                <option value="Raw Material">Raw Material</option>
+                            </select></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Unit</label><select id="product-unit">
+                                <option value="kg">Kilogram (kg)</option>
+                                <option value="g">Gram (g)</option>
+                            </select></div>
+                        <div class="form-group"><label>Price (LKR)</label><input type="number" id="product-price"
+                                placeholder="500.00"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Initial Stock</label><input type="number" id="product-stock"
+                                placeholder="100"></div>
+                        <div class="form-group"><label>Reorder Level</label><input type="number" id="product-reorder"
+                                placeholder="20"></div>
+                    </div>
+                    <button class="btn-success" onclick="addProduct()">➕ Add Product</button>
+                </div>
+                <div class="alerts-section">
+                    <h2>📋 Product List</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Current Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 3: Raw Material -->
+            <div id="tab-rawmaterial" class="tab-content">
+                <div class="product-form">
+                    <h2 style="color: var(--primary-brown); margin-bottom: 20px;">🌾 Raw Material Management</h2>
+                    <div class="form-row">
+                        <div class="form-group"><label>Raw Material Name</label><input type="text" id="raw-name"
+                                placeholder="e.g., Turmeric Roots"></div>
+                        <div class="form-group"><label>Supplier</label><input type="text" id="raw-supplier"
+                                placeholder="Supplier name"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Quantity (kg)</label><input type="number" id="raw-quantity"
+                                placeholder="500"></div>
+                        <div class="form-group"><label>Unit Price</label><input type="number" id="raw-price"
+                                placeholder="200.00"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Received Date</label><input type="date" id="raw-date"
+                                value="2026-06-10"></div>
+                        <div class="form-group"><label>Batch No</label><input type="text" id="raw-batch"
+                                placeholder="BATCH001"></div>
+                    </div>
+                    <button class="btn-success" onclick="addRawMaterial()">➕ Add Raw Material</button>
+                </div>
+                <div class="alerts-section">
+                    <h2>📋 Raw Materials Inventory</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Material</th>
+                                <th>Supplier</th>
+                                <th>Batch</th>
+                                <th>Quantity</th>
+                                <th>Received Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="raw-material-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 4: Reorder Alerts -->
+            <div id="tab-alerts" class="tab-content">
+                <div class="alerts-section">
+                    <h2>⚠️ Items Below Reorder Level</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Current Stock</th>
+                                <th>Reorder Level</th>
+                                <th>Suggested Order</th>
+                                <th>Supplier</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reorder-list-body"></tbody>
+                    </table>
+                </div>
+                <div class="alerts-section">
+                    <h2>🔄 Pending Reorders</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Order Date</th>
+                                <th>Expected Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pending-reorders-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 5: Stock Report -->
+            <div id="tab-stockreport" class="tab-content">
+                <div class="product-form">
+                    <h2 style="color: var(--primary-brown); margin-bottom: 20px;">📊 Stock Report</h2>
+                    <div class="form-row">
+                        <div class="form-group"><label>Report Type</label><select id="stock-report-type">
+                                <option value="inventory">Inventory Summary</option>
+                                <option value="category">Category-wise Stock</option>
+                                <option value="valuation">Stock Valuation</option>
+                            </select></div>
+                        <div class="form-group"><label>Category</label><select id="report-category">
+                                <option value="all">All Categories</option>
+                                <option value="Spice">Spice</option>
+                                <option value="Whole Spice">Whole Spice</option>
+                                <option value="Raw Material">Raw Material</option>
+                            </select></div>
+                    </div>
+                    <button class="btn-success" onclick="generateStockReport()">📊 Generate Report</button>
+                </div>
+                <div id="stock-report-results" class="alerts-section"></div>
+            </div>
+
+            <!-- Tab 6: Delivery -->
+            <div id="tab-delivery" class="tab-content">
+                <div class="alerts-section">
+                    <h2>🚚 Delivery Management</h2>
+                    <div class="delivery-status-grid" id="delivery-status-summary"></div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Order Date</th>
+                                <th>Expected Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="delivery-status-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 7: Fast/Slow Items -->
+            <div id="tab-fastslow" class="tab-content">
+                <div class="product-form">
+                    <h2 style="color: var(--primary-brown); margin-bottom: 20px;">⚡ Fast & Slow Moving Analysis</h2>
+                    <div class="form-row">
+                        <div class="form-group"><label>Period</label><select id="velocity-period">
+                                <option value="30">Last 30 Days</option>
+                                <option value="60">Last 60 Days</option>
+                                <option value="90">Last 90 Days</option>
+                            </select></div>
+                        <div class="form-group"><label>Category</label><select id="velocity-category">
+                                <option value="all">All Categories</option>
+                                <option value="Spice">Spice</option>
+                                <option value="Whole Spice">Whole Spice</option>
+                            </select></div>
+                    </div>
+                    <button class="btn-success" onclick="analyzeVelocity()">📊 Analyze</button>
+                </div>
+                <div class="alerts-section">
+                    <h2>⚡ Fast Moving Items (Top 5)</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Sold</th>
+                                <th>Sales Value</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fast-moving-body"></tbody>
+                    </table>
+                </div>
+                <div class="alerts-section">
+                    <h2>🐌 Slow Moving Items</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Sold</th>
+                                <th>Days</th>
+                                <th>Status</th>
+                        </thead>
+                        <tbody id="slow-moving-body"></tbody>
+                    </table>
+                </div>
+                <div class="alerts-section" id="turnover-analysis"></div>
+            </div>
+
+            <!-- Tab 8: Return Report -->
+            <div id="tab-returns" class="tab-content">
+                <div class="product-form">
+                    <h2 style="color: var(--primary-brown); margin-bottom: 20px;">🔄 Return Product Report</h2>
+                    <div class="form-row">
+                        <div class="form-group"><label>From Date</label><input type="date" id="return-from"
+                                value="2026-06-01"></div>
+                        <div class="form-group"><label>To Date</label><input type="date" id="return-to"
+                                value="2026-06-10"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Return Type</label><select id="return-type">
+                                <option value="all">All Returns</option>
+                                <option value="customer">Customer Returns</option>
+                                <option value="supplier">Supplier Returns</option>
+                            </select></div>
+                    </div>
+                    <button class="btn-success" onclick="generateReturnReport()">📊 Generate Return Report</button>
+                </div>
+                <div class="alerts-section">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Return ID</th>
+                                <th>Product</th>
+                                <th>Party</th>
+                                <th>Date</th>
+                                <th>Quantity</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="return-report-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab 9: Active Suppliers (Approved from Manager) -->
+            <div id="tab-suppliers" class="tab-content">
+                <div class="alerts-section">
+                    <h2 style="color: var(--primary-brown); margin-bottom: 20px;">🏭 Approved Active Suppliers</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Supplier ID</th>
+                                <th>Company Name</th>
+                                <th>Contact Person</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Materials Supplied</th>
+                                <th>Orders Cost (Rs.)</th>
+                                <th>Status</th>
+                                <th>Approved Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="active-suppliers-body"></tbody>
+                    </table>
+                    <div id="no-suppliers-msg" style="text-align:center; padding:20px; color:#999; display:none;">
+                        ℹ️ No active suppliers available. Wait for Manager approval.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 10: Supplier Sample Flow -->
+            <div id="tab-supplier-flow" class="tab-content">
+                <div class="product-form">
+                    <h2 style="color: var(--primary-brown); margin-bottom: 20px;">1️⃣ Request New Sample from Supplier
+                    </h2>
+                    <div class="form-row">
+                        <div class="form-group"><label>Supplier Name</label><input type="text" id="sample-supplier-name"
+                                placeholder="e.g., Kalutara Farmers"></div>
+                        <div class="form-group"><label>Raw Material</label><input type="text" id="sample-material"
+                                placeholder="e.g., Turmeric Roots"></div>
+                        <div class="form-group"><label>Quantity (kg)</label><input type="number" id="sample-qty"
+                                placeholder="2"></div>
+                    </div>
+                    <button class="btn-success" onclick="requestSample()">📦 Request Sample</button>
+                </div>
+                <div class="alerts-section">
+                    <h2>📋 Sample Requests</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Supplier</th>
+                                <th>Material</th>
+                                <th>Qty</th>
+                                <th>Request Date</th>
+                                <th>Status</th>
+                                <th>QC Result</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sample-requests-body"></tbody>
+                    </table>
+                </div>
+                <div class="alerts-section">
+                    <h2>🔬 Quality Control Reports</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Sample ID</th>
+                                <th>Supplier</th>
+                                <th>Material</th>
+                                <th>Test Date</th>
+                                <th>Result</th>
+                                <th>Remarks</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="qc-reports-body"></tbody>
+                    </table>
+                </div>
+                <div class="alerts-section">
+                    <h2>✅ Select Best Sample & Create PO</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Sample ID</th>
+                                <th>Supplier</th>
+                                <th>Material</th>
+                                <th>QC Result</th>
+                                <th>Price (LKR/kg)</th>
+                                <th>Quality Score</th>
+                                <th>Select</th>
+                            </tr>
+                        </thead>
+                        <tbody id="best-sample-body"></tbody>
+                    </table>
+                    <div id="po-creation-area" style="margin-top:20px; display:none;">
+                        <h3>Create Purchase Order (PO)</h3>
+                        <div class="form-row">
+                            <div class="form-group"><label>Selected Supplier</label><input type="text" id="po-supplier"
+                                    readonly></div>
+                            <div class="form-group"><label>Material</label><input type="text" id="po-material" readonly>
+                            </div>
+                            <div class="form-group"><label>Unit Price (LKR)</label><input type="number" id="po-price"
+                                    placeholder="Enter agreed price"></div>
+                            <div class="form-group"><label>Quantity (kg)</label><input type="number" id="po-qty"
+                                    placeholder="Enter order quantity"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Delivery Date</label><input type="date"
+                                    id="po-delivery-date"></div>
+                            <div class="form-group"><label>Payment Terms</label><select id="po-terms">
+                                    <option>30 Days Credit</option>
+                                    <option>Cash on Delivery</option>
+                                    <option>Advance 50%</option>
+                                </select></div>
+                        </div><button class="btn-success" onclick="createPurchaseOrder()">📄 Create PO & Send for
+                            Manager Approval</button><button class="btn-secondary" onclick="goToManagerDashboard()"
+                            style="margin-left:10px;">👑 Open Manager Dashboard</button>
+                    </div>
+                </div>
+                <div class="alerts-section">
+                    <h2>📄 Purchase Orders (Pending Manager Approval)</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>PO #</th>
+                                <th>Supplier</th>
+                                <th>Material</th>
+                                <th>Qty</th>
+                                <th>Total (LKR)</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pending-po-body"></tbody>
+                    </table>
+                </div>
+                <div class="alerts-section">
+                    <h2>📦 Goods Received Note (GRN) - Received from Supplier</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>PO #</th>
+                                <th>Supplier</th>
+                                <th>Material</th>
+                                <th>Ordered Qty</th>
+                                <th>Received Qty</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="received-goods-body"></tbody>
+                    </table>
+                    <div id="grn-creation-area" style="margin-top:20px; display:none;">
+                        <h3>Create GRN</h3>
+                        <div class="form-row">
+                            <div class="form-group"><label>PO Number</label><input type="text" id="grn-po" readonly>
+                            </div>
+                            <div class="form-group"><label>Received Date</label><input type="date" id="grn-date"></div>
+                            <div class="form-group"><label>Received Quantity (kg)</label><input type="number"
+                                    id="grn-qty"></div>
+                            <div class="form-group"><label>Inspected By</label><input type="text" id="grn-inspector"
+                                    placeholder="Stock Clerk Name"></div>
+                        </div>
+                        <div class="form-group"><label>Remarks</label><textarea id="grn-remarks" rows="2"
+                                placeholder="Any damages or issues?"></textarea></div><button class="btn-success"
+                            onclick="createGRN()">✅ Create GRN & Send for Approval</button>
+                    </div>
+                </div>
+                <div class="alerts-section">
+                    <h2>💰 Approved GRNs (Ready for Payment)</h2>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>GRN #</th>
+                                <th>PO #</th>
+                                <th>Supplier</th>
+                                <th>Amount (LKR)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="approved-grn-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="footer">
+                <p>✅ Stock Clerk can update Delivery Status | Click dropdown to change Pending → Shipped → Delivered</p>
+                <p>🏭 Supplier Sample Flow: Request → QC → Select Best → PO → Receive → GRN</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ DATABASE ============
+        let products = [
+            { id: 1, code: 'P001', name: 'Turmeric Powder', category: 'Spice', unit: 'kg', price: 500, stock: 450, reorder: 100, supplier: 'Lanka Spices' },
+            { id: 2, code: 'P002', name: 'Chili Powder', category: 'Spice', unit: 'kg', price: 400, stock: 15, reorder: 25, supplier: 'Lanka Spices' },
+            { id: 3, code: 'P003', name: 'Black Pepper', category: 'Spice', unit: 'kg', price: 780, stock: 8, reorder: 20, supplier: 'Jaffna Exports' },
+            { id: 4, code: 'P004', name: 'Cinnamon Sticks', category: 'Spice', unit: 'kg', price: 950, stock: 320, reorder: 50, supplier: 'Matale Growers' },
+            { id: 5, code: 'P005', name: 'Cardamom', category: 'Whole Spice', unit: 'kg', price: 2800, stock: 25, reorder: 15, supplier: 'Jaffna Exports' }
+        ];
+
+        let rawMaterials = [
+            { id: 1, name: 'Turmeric Roots', supplier: 'Kalutara Farmers', batch: 'BATCH001', quantity: 500, receivedDate: '2026-03-01', status: 'In Stock' },
+            { id: 2, name: 'Chili Peppers', supplier: 'Lanka Spices', batch: 'BATCH002', quantity: 300, receivedDate: '2026-03-05', status: 'In Stock' }
+        ];
+
+        let deliveries = [
+            { id: 'R001', product: 'Chili Powder', quantity: 50, orderDate: '2026-03-10', expectedDate: '2026-03-17', status: 'Pending' },
+            { id: 'R002', product: 'Pepper Powder', quantity: 30, orderDate: '2026-03-12', expectedDate: '2026-03-19', status: 'Shipped' },
+            { id: 'R003', product: 'Chili Peppers', quantity: 100, orderDate: '2026-03-14', expectedDate: '2026-03-21', status: 'Pending' }
+        ];
+
+        let sales = [
+            { productId: 1, quantity: 120, date: '2026-03-01' }, { productId: 1, quantity: 85, date: '2026-03-05' },
+            { productId: 2, quantity: 60, date: '2026-03-02' }, { productId: 2, quantity: 45, date: '2026-03-07' },
+            { productId: 3, quantity: 5, date: '2026-03-04' }, { productId: 4, quantity: 8, date: '2026-03-06' },
+            { productId: 5, quantity: 2, date: '2026-03-01' }, { productId: 5, quantity: 3, date: '2026-03-10' }
+        ];
+
+        let movements = [
+            { date: '2026-03-15', productId: 2, type: 'add', quantity: 50 },
+            { date: '2026-03-14', productId: 3, type: 'remove', quantity: 5 },
+            { date: '2026-03-13', productId: 1, type: 'add', quantity: 100 }
+        ];
+
+        let reorders = [
+            { id: 'R001', productId: 2, quantity: 50, orderDate: '2026-03-10', expectedDate: '2026-03-17', status: 'Pending' },
+            { id: 'R002', productId: 3, quantity: 30, orderDate: '2026-03-12', expectedDate: '2026-03-19', status: 'Shipped' }
+        ];
+
+        let returnRecords = [
+            { id: 'RET-001', product: 'Turmeric Powder', party: 'Saman Perera', date: '2026-03-15', quantity: '5 kg', reason: 'Damaged', status: 'Approved', type: 'customer' },
+            { id: 'RET-002', product: 'Chili Powder', party: 'Nimali Stores', date: '2026-03-16', quantity: '3 kg', reason: 'Expired', status: 'Pending', type: 'supplier' }
+        ];
+
+        // ============ SUPPLIER SAMPLE FLOW DATA ============
+        let sampleRequests = [
+            { id: 'SAMP-001', supplier: 'Kalutara Farmers', material: 'Turmeric Roots', qty: 2, requestDate: '2026-03-10', status: 'QC Pending', qcResult: null },
+            { id: 'SAMP-002', supplier: 'Lanka Spices', material: 'Black Pepper', qty: 1, requestDate: '2026-03-12', status: 'QC Completed', qcResult: 'Pass' }
+        ];
+
+        let qcReports = [
+            { sampleId: 'SAMP-002', supplier: 'Lanka Spices', material: 'Black Pepper', testDate: '2026-03-14', result: 'Pass', remarks: 'Good quality', price: 750, qualityScore: 8.5 },
+            { sampleId: 'SAMP-001', supplier: 'Kalutara Farmers', material: 'Turmeric Roots', testDate: '2026-03-15', result: 'Reject', remarks: 'High moisture', price: null, qualityScore: null }
+        ];
+
+        let purchaseOrders = [
+            { id: 'PO-001', supplier: 'Lanka Spices', material: 'Black Pepper', qty: 100, unitPrice: 750, total: 75000, deliveryDate: '2026-03-25', terms: '30 Days Credit', status: 'Pending Approval', approved: false, sampleId: 'SAMP-002' }
+        ];
+
+        let grns = [];
+
+        // ============ ACTIVE SUPPLIERS FROM MANAGER ============
+        function getActiveSuppliers() {
+            let managerSuppliers = localStorage.getItem('managerSuppliers');
+            if (managerSuppliers) {
+                try {
+                    let allSuppliers = JSON.parse(managerSuppliers);
+                    return allSuppliers.filter(s => s.status === 'Active');
+                } catch (e) { }
+            }
+            // Fallback sample data if no data from manager
+            return [
+                { id: 'S001', name: 'Lanka Spices', contact: 'Kamal Perera', email: 'lanka@spices.com', phone: '071-1234567', materials: 'Turmeric, Chili Powder', ordersCost: 500000, status: 'Active', approvedDate: '2025-01-16' },
+                { id: 'S002', name: 'Jaffna Exports', contact: 'Priya Kumari', email: 'jaffna@exports.lk', phone: '077-2345678', materials: 'Black Pepper, Cardamom', ordersCost: 250000, status: 'Active', approvedDate: '2025-02-10' }
+            ];
+        }
+
+        function renderActiveSuppliers() {
+            let suppliers = getActiveSuppliers();
+            let tbody = document.getElementById('active-suppliers-body');
+            let noMsg = document.getElementById('no-suppliers-msg');
+
+            if (!suppliers || suppliers.length === 0) {
+                tbody.innerHTML = '';
+                noMsg.style.display = 'block';
+            } else {
+                noMsg.style.display = 'none';
+                tbody.innerHTML = suppliers.map(s => `
+                    <tr>
+                        <td><strong>${escapeHtml(s.id)}</strong></td>
+                        <td>${escapeHtml(s.name)}</td>
+                        <td>${escapeHtml(s.contact || 'N/A')}</td>
+                        <td>${escapeHtml(s.email)}</td>
+                        <td>${escapeHtml(s.phone)}</td>
+                        <td>${escapeHtml(s.materials)}</td>
+                        <td><strong>Rs. ${(s.ordersCost || 0).toLocaleString()}</strong></td>
+                        <td><span class="badge badge-success">✅ Active</span></td>
+                        <td>${s.approvedDate || 'N/A'}</td>
+                        <td><button class="btn-contact" onclick="contactSupplier('${escapeHtml(s.email)}', '${escapeHtml(s.name)}')">📧 Contact</button></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function contactSupplier(email, name) {
+            if (confirm(`Send email to ${name} (${email})?`)) {
+                window.open(`mailto:${email}?subject=Pearl Land Commodities - Order Inquiry&body=Dear ${name},\n\nWe would like to place an order with your company.\n\nPlease share current pricing and availability.\n\nBest regards,\nPearl Land Commodities Stock Department`);
+            }
+        }
+
+        function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, function (m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+
+        // ============ LOAD/SAVE ============
+        function loadDataFromStorage() {
+            let storedPOs = localStorage.getItem('purchaseOrders');
+            if (storedPOs) purchaseOrders = JSON.parse(storedPOs);
+            let storedGRNs = localStorage.getItem('grns');
+            if (storedGRNs) grns = JSON.parse(storedGRNs);
+        }
+        function saveDataToStorage() { localStorage.setItem('purchaseOrders', JSON.stringify(purchaseOrders)); localStorage.setItem('grns', JSON.stringify(grns)); }
+
+        // ============ INITIALIZE ============
+        document.addEventListener('DOMContentLoaded', function () {
+            loadDataFromStorage();
+            updateStats();
+            loadProducts();
+            loadLowStockTable();
+            loadCriticalAlerts();
+            loadRecentMovements();
+            loadReorderList();
+            loadPendingReorders();
+            loadDeliveryStatus();
+            analyzeVelocity();
+            loadReturnReport();
+            loadRawMaterials();
+            loadSampleFlowData();
+            renderActiveSuppliers();
+
+            // Listen for storage changes from Manager Dashboard
+            window.addEventListener('storage', function (e) {
+                if (e.key === 'managerSuppliers') {
+                    renderActiveSuppliers();
+                }
+            });
+        });
+
+        function updateStats() {
+            let totalProducts = products.length;
+            let lowStock = products.filter(p => p.stock <= p.reorder && p.stock > 0).length;
+            let outOfStock = products.filter(p => p.stock === 0).length;
+            let totalValue = products.reduce((sum, p) => sum + (p.stock * p.price), 0);
+            document.getElementById('stats-summary').innerHTML = `<div class="stat-card"><div class="stat-icon">📦</div><div class="stat-details"><h3>Total Products</h3><div class="stat-number">${totalProducts}</div></div></div><div class="stat-card"><div class="stat-icon">⚠️</div><div class="stat-details"><h3>Low Stock Items</h3><div class="stat-number">${lowStock}</div></div></div><div class="stat-card"><div class="stat-icon">⛔</div><div class="stat-details"><h3>Out of Stock</h3><div class="stat-number">${outOfStock}</div></div></div><div class="stat-card"><div class="stat-icon">💰</div><div class="stat-details"><h3>Stock Value</h3><div class="stat-number">Rs. ${totalValue.toLocaleString()}</div></div></div>`;
+        }
+
+        function loadProducts() {
+            let html = '';
+            products.forEach(p => {
+                let statusClass = p.stock === 0 ? 'badge-danger' : (p.stock <= p.reorder ? 'badge-warning' : 'badge-success');
+                let statusText = p.stock === 0 ? 'Out of Stock' : (p.stock <= p.reorder ? 'Low Stock' : 'Good');
+                html += `<tr><td>${p.code}</td><td>${p.name}</td><td>${p.category}</td><td>Rs. ${p.price}</td><td>${p.stock} ${p.unit}</td><td><span class="badge ${statusClass}">${statusText}</span></td><td><button class="btn-secondary btn-sm" onclick="reorderProduct(${p.id})">🔄 Reorder</button></td></tr>`;
+            });
+            document.getElementById('product-body').innerHTML = html;
+        }
+
+        function loadRawMaterials() {
+            let html = '';
+            rawMaterials.forEach(r => { html += `<tr><td>${r.name}</td><td>${r.supplier}</td><td>${r.batch}</td><td>${r.quantity} kg</td><td>${r.receivedDate}</td><td><span class="badge badge-success">${r.status}</span></td></tr>`; });
+            document.getElementById('raw-material-body').innerHTML = html;
+        }
+
+        function addRawMaterial() {
+            let name = document.getElementById('raw-name').value, supplier = document.getElementById('raw-supplier').value, quantity = document.getElementById('raw-quantity').value, date = document.getElementById('raw-date').value, batch = document.getElementById('raw-batch').value;
+            if (!name || !supplier) { alert('Please fill required fields'); return; }
+            rawMaterials.push({ id: rawMaterials.length + 1, name, supplier, batch, quantity: parseInt(quantity), receivedDate: date, status: 'In Stock' });
+            alert('Raw Material added!'); loadRawMaterials();
+            document.getElementById('raw-name').value = ''; document.getElementById('raw-supplier').value = ''; document.getElementById('raw-quantity').value = ''; document.getElementById('raw-batch').value = '';
+        }
+
+        function loadLowStockTable() {
+            let lowStock = products.filter(p => p.stock <= p.reorder && p.stock > 0);
+            document.getElementById('low-stock-body').innerHTML = lowStock.map(p => `<tr><td>${p.name}</td><td>${p.category}</td><td>${p.stock} ${p.unit}</td><td>${p.reorder} ${p.unit}</td><td><span class="badge badge-warning">Low Stock</span></td><td><button class="btn-secondary btn-sm" onclick="reorderProduct(${p.id})">Reorder</button></td></tr>`).join('') || '<tr><td colspan="6" style="text-align:center">No low stock items</td></tr>';
+        }
+
+        function loadCriticalAlerts() {
+            let critical = products.filter(p => p.stock === 0);
+            document.getElementById('critical-alerts-list').innerHTML = critical.map(p => `<div class="alert-item"><span><strong>${p.name}</strong> - Out of stock!</span><span class="stock-critical">CRITICAL</span><button class="btn-secondary btn-sm" onclick="reorderProduct(${p.id})">Reorder Now</button></div>`).join('') || '<p style="padding:15px">✅ No critical stock issues</p>';
+        }
+
+        function loadRecentMovements() {
+            let recent = movements.slice(-5).reverse();
+            document.getElementById('recent-movements').innerHTML = recent.map(m => { let product = products.find(p => p.id === m.productId); return `<tr><td>${m.date}</td><td>${product ? product.name : 'Unknown'}</td><td><span class="badge badge-${m.type === 'add' ? 'success' : 'warning'}">${m.type}</span></td><td>${m.quantity} kg</td></tr>`; }).join('');
+        }
+
+        function loadReorderList() {
+            let needReorder = products.filter(p => p.stock <= p.reorder && p.stock > 0);
+            document.getElementById('reorder-list-body').innerHTML = needReorder.map(p => { let suggested = p.reorder * 2 - p.stock; return `<tr><td>${p.name}</td><td>${p.stock} ${p.unit}</td><td>${p.reorder} ${p.unit}</td><td>${suggested} ${p.unit}</td><td>${p.supplier}</td><td><button class="btn-secondary btn-sm" onclick="reorderProduct(${p.id})">Place Order</button></td></tr>`; }).join('') || '<tr><td colspan="6" style="text-align:center">No items need reorder</td></tr>';
+        }
+
+        function loadPendingReorders() {
+            document.getElementById('pending-reorders-body').innerHTML = reorders.map(r => { let product = products.find(p => p.id === r.productId); return `<tr><td>${r.id}</td><td>${product ? product.name : 'Unknown'}</td><td>${r.quantity} kg</td><td>${r.orderDate}</td><td>${r.expectedDate}</td><td><span class="badge badge-warning">${r.status}</span></td></tr>`; }).join('') || '<tr><td colspan="6">No pending reorders</td></tr>';
+        }
+
+        function loadDeliveryStatus() {
+            let pending = deliveries.filter(d => d.status === 'Pending').length, shipped = deliveries.filter(d => d.status === 'Shipped').length, delivered = deliveries.filter(d => d.status === 'Delivered').length, canceled = deliveries.filter(d => d.status === 'Canceled').length;
+            document.getElementById('delivery-status-summary').innerHTML = `<div class="delivery-status-card"><h3>PENDING</h3><p>${pending}</p></div><div class="delivery-status-card"><h3>SHIPPED</h3><p>${shipped}</p></div><div class="delivery-status-card"><h3>DELIVERED</h3><p>${delivered}</p></div><div class="delivery-status-card"><h3>CANCELED</h3><p>${canceled}</p></div>`;
+            let tableHtml = '';
+            deliveries.forEach((delivery, idx) => { const statusClass = delivery.status === 'Pending' ? 'pending' : (delivery.status === 'Shipped' ? 'shipped' : 'delivered'); tableHtml += `<tr><td>${delivery.id}</td><td>${delivery.product}</td><td>${delivery.quantity} kg</td><td>${delivery.orderDate}</td><td>${delivery.expectedDate}</td><td><select class="status-select ${statusClass}" onchange="updateDeliveryStatus(${idx}, this.value)"><option value="Pending" ${delivery.status === 'Pending' ? 'selected' : ''}>Pending</option><option value="Shipped" ${delivery.status === 'Shipped' ? 'selected' : ''}>Shipped</option><option value="Delivered" ${delivery.status === 'Delivered' ? 'selected' : ''}>Delivered</option><option value="Canceled" ${delivery.status === 'Canceled' ? 'selected' : ''}>Canceled</option></select></td><td><button class="btn-secondary btn-sm" onclick="updateDeliveryStatus(${idx}, document.querySelector('#tab-delivery .status-select').value)">Update</button></td></tr>`; });
+            document.getElementById('delivery-status-body').innerHTML = tableHtml || '<tr><td colspan="7">No delivery data</td></tr>';
+        }
+
+        function updateDeliveryStatus(idx, newStatus) { deliveries[idx].status = newStatus; alert(`✅ Delivery ${deliveries[idx].id} status updated to ${newStatus}`); loadDeliveryStatus(); }
+
+        function addProduct() {
+            let name = document.getElementById('product-name').value, category = document.getElementById('product-category').value, unit = document.getElementById('product-unit').value, price = parseFloat(document.getElementById('product-price').value), stock = parseFloat(document.getElementById('product-stock').value), reorder = parseFloat(document.getElementById('product-reorder').value);
+            if (!name || !price) { alert('Please fill required fields'); return; }
+            let newId = products.length + 1, code = 'P' + String(newId).padStart(3, '0');
+            products.push({ id: newId, code, name, category, unit, price, stock: stock || 0, reorder: reorder || 10, supplier: 'Lanka Spices' });
+            alert(`Product added! Code: ${code}`); loadProducts(); updateStats(); loadLowStockTable(); loadReorderList();
+            document.getElementById('product-name').value = ''; document.getElementById('product-price').value = ''; document.getElementById('product-stock').value = '';
+        }
+
+        function reorderProduct(productId) {
+            let product = products.find(p => p.id === productId);
+            let suggestedQty = product.reorder * 2 - product.stock;
+            if (confirm(`Place reorder for ${product.name}?\nSuggested: ${suggestedQty} ${product.unit}`)) {
+                let reorderId = 'R' + String(reorders.length + 1).padStart(3, '0');
+                let today = new Date().toISOString().split('T')[0];
+                let expected = new Date(); expected.setDate(expected.getDate() + 7);
+                reorders.push({ id: reorderId, productId: productId, quantity: suggestedQty, orderDate: today, expectedDate: expected.toISOString().split('T')[0], status: 'Pending' });
+                alert(`Reorder placed! ID: ${reorderId}`); loadPendingReorders(); showTab('alerts');
+            }
+        }
+
+        function generateStockReport() {
+            let reportType = document.getElementById('stock-report-type').value, category = document.getElementById('report-category').value;
+            let filtered = category === 'all' ? products : products.filter(p => p.category === category);
+            let html = '<h3>Stock Report</h3><table class="data-table"><thead><tr><th>Code</th><th>Product</th><th>Stock</th><th>Status</th><th>Value</th></tr></thead><tbody>';
+            filtered.forEach(p => { let statusClass = p.stock === 0 ? 'badge-danger' : (p.stock <= p.reorder ? 'badge-warning' : 'badge-success'); let statusText = p.stock === 0 ? 'Out of Stock' : (p.stock <= p.reorder ? 'Low Stock' : 'Good'); html += `<tr><td>${p.code}</td><td>${p.name}</td><td>${p.stock} ${p.unit}</td><td><span class="badge ${statusClass}">${statusText}</span></td><td>Rs. ${(p.stock * p.price).toLocaleString()}</td></tr>`; });
+            let total = filtered.reduce((s, p) => s + (p.stock * p.price), 0);
+            html += `<tr style="background:#fff3cd"><td colspan="4"><strong>TOTAL</strong></td><td><strong>Rs. ${total.toLocaleString()}</strong></td></tr></tbody></table>`;
+            document.getElementById('stock-report-results').innerHTML = html;
+        }
+
+        function analyzeVelocity() {
+            let period = parseInt(document.getElementById('velocity-period').value);
+            let cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - period);
+
+            let filteredSales = sales.filter(s => new Date(s.date) >= cutoffDate);
+            let salesByProduct = {};
+            filteredSales.forEach(s => {
+                salesByProduct[s.productId] = (salesByProduct[s.productId] || 0) + s.quantity;
+            });
+
+            let productStats = products.map(p => {
+                let sold = salesByProduct[p.id] || 0;
+                let turnover = p.stock > 0 ? (sold / p.stock) : 0;
+                return { ...p, sold, turnover };
+            });
+
+            let fastMoving = [...productStats].filter(p => p.sold > 0).sort((a, b) => b.sold - a.sold).slice(0, 5);
+            document.getElementById('fast-moving-body').innerHTML = fastMoving.map((p, i) =>
+                `<tr><td>#${i + 1}</td><td>${p.name}</td><td>${p.category}</td><td>${p.sold} kg</td><td>Rs. ${(p.sold * p.price).toLocaleString()}</td><td>${p.turnover.toFixed(2)}x</td><td><span class="badge badge-success">Increase stock</span></td></tr>`
+            ).join('') || '<tr><td colspan="7">No data</td></tr>';
+
+            let slowMoving = productStats.filter(p => p.turnover < 0.5 && p.stock > 5);
+            document.getElementById('slow-moving-body').innerHTML = slowMoving.map(p =>
+                `<tr><td>${p.name}</td><td>${p.category}</td><td>${p.stock} kg</td><td>${p.sold} kg</td><td>${p.stock > 0 ? (period / (p.sold || 1)).toFixed(0) : 0} days</td><td><span class="badge badge-warning">Slow Moving</span></td></tr>`
+            ).join('') || '<tr><td colspan="7">No slow moving items</td></tr>';
+
+            // ===== ADD THIS BLOCK — save to localStorage for Manager Dashboard =====
+            let fastSlowData = {
+                period: period,
+                updatedAt: new Date().toISOString(),
+                items: productStats.map(p => ({
+                    name: p.name,
+                    short: p.name.split(' ')[0],
+                    sold: p.sold,
+                    stock: p.stock,
+                    capacity: p.stock + p.sold,
+                    price: p.price,
+                    turnover: parseFloat(p.turnover.toFixed(3)),
+                    isFast: p.turnover >= 0.5 || p.sold > 50
+                })),
+                trendByProduct: productStats.map(p => ({
+                    name: p.name,
+                    dailySales: sales
+                        .filter(s => s.productId === p.id)
+                        .sort((a, b) => new Date(a.date) - new Date(b.date))
+                        .map(s => ({ date: s.date, qty: s.quantity }))
+                }))
+            };
+            localStorage.setItem('stockClerkFastSlow', JSON.stringify(fastSlowData));
+            window.dispatchEvent(new StorageEvent('storage', { key: 'stockClerkFastSlow' }));
+            // ===== END ADD =====
+        }
+
+        function loadReturnReport() {
+            document.getElementById('return-report-body').innerHTML = returnRecords.map(r => { let statusClass = r.status === 'Approved' ? 'badge-success' : 'badge-warning'; return `<tr><td>${r.id}</td><td>${r.product}</td><td>${r.party}</td><td>${r.date}</td><td>${r.quantity}</td><td>${r.reason}</td><td><span class="badge ${statusClass}">${r.status}</span></td></tr>`; }).join('') || '<tr><td colspan="7">No returns</td></tr>';
+        }
+
+        function generateReturnReport() {
+            let from = document.getElementById('return-from').value, to = document.getElementById('return-to').value, type = document.getElementById('return-type').value;
+            let filtered = returnRecords.filter(r => { let matchesType = type === 'all' || r.type === type; let matchesDate = (!from || r.date >= from) && (!to || r.date <= to); return matchesType && matchesDate; });
+            document.getElementById('return-report-body').innerHTML = filtered.map(r => { let statusClass = r.status === 'Approved' ? 'badge-success' : 'badge-warning'; return `<tr><td>${r.id}</td><td>${r.product}</td><td>${r.party}</td><td>${r.date}</td><td>${r.quantity}</td><td>${r.reason}</td><td><span class="badge ${statusClass}">${r.status}</span></td></tr>`; }).join('') || '<tr><td colspan="7">No matching records</td></tr>';
+        }
+
+        // ============ SUPPLIER SAMPLE FLOW ============
+        function loadSampleFlowData() {
+            document.getElementById('sample-requests-body').innerHTML = sampleRequests.map(s => `<tr><td>${s.id}</td><td>${s.supplier}</td><td>${s.material}</td><td>${s.qty} kg</td><td>${s.requestDate}</td><td><span class="badge ${s.status === 'QC Completed' ? 'badge-success' : 'badge-warning'}">${s.status}</span></td><td>${s.qcResult || '-'}</td><td>${s.status === 'QC Pending' ? `<button class="btn-secondary btn-sm" onclick="simulateQC('${s.id}', 'Pass', 'Good quality', 800, 9)">✅ Pass</button> <button class="btn-secondary btn-sm" onclick="simulateQC('${s.id}', 'Reject', 'Poor quality', null, 0)">❌ Reject</button>` : '-'}</td></tr>`).join('') || '<tr><td colspan="8">No sample requests</td></tr>';
+            document.getElementById('qc-reports-body').innerHTML = qcReports.map(q => `<tr><td>${q.sampleId}</td><td>${q.supplier}</td><td>${q.material}</td><td>${q.testDate}</td><td><span class="badge ${q.result === 'Pass' ? 'badge-success' : 'badge-danger'}">${q.result}</span></td><td>${q.remarks}</td><td>${q.result === 'Pass' ? `<button class="btn-secondary btn-sm" onclick="selectForPO('${q.sampleId}')">Select for PO</button>` : `<button class="btn-secondary btn-sm" onclick="sendRejectFeedback('${q.supplier}', '${q.material}', '${q.remarks}')">📧 Send Reject Feedback</button>`}</td></tr>`).join('') || '<tr><td colspan="7">No QC reports</td></tr>';
+            let passedSamples = qcReports.filter(q => q.result === 'Pass');
+            document.getElementById('best-sample-body').innerHTML = passedSamples.map(q => `<tr><td>${q.sampleId}</td><td>${q.supplier}</td><td>${q.material}</td><td><span class="badge badge-success">Pass</span></td><td>${q.price ? 'Rs. ' + q.price : 'N/A'}</td><td>${q.qualityScore || 'N/A'}</td><td><button class="btn-secondary btn-sm" onclick="selectForPO('${q.sampleId}')">Select</button></td></tr>`).join('') || '<tr><td colspan="7">No QC Passed samples available</td></tr>';
+            document.getElementById('pending-po-body').innerHTML = purchaseOrders.map(po => `<tr><td>${po.id}</td><td>${po.supplier}</td><td>${po.material}</td><td>${po.qty} kg</td><td>Rs. ${po.total.toLocaleString()}</td><td><span class="badge ${po.approved ? 'badge-success' : 'badge-warning'}">${po.status}</span></td><td>${!po.approved ? 'Waiting for Manager...' : '<span class="badge badge-success">Approved</span>'}</td></tr>`).join('') || '<tr><td colspan="7">No POs</td></tr>';
+            let approvedPOs = purchaseOrders.filter(po => po.approved === true);
+            document.getElementById('received-goods-body').innerHTML = approvedPOs.map(po => { let alreadyGRN = grns.some(g => g.poId === po.id); return alreadyGRN ? '' : `<tr><td>${po.id}</td><td>${po.supplier}</td><td>${po.material}</td><td>${po.qty} kg</td><td><input type="number" id="rec-qty-${po.id}" placeholder="Enter received qty" style="width:100px"></td><td><button class="btn-secondary btn-sm" onclick="receiveMaterial('${po.id}')">Create GRN</button></td></tr>`; }).join('') || '<tr><td colspan="6">No pending receipts</td></tr>';
+            let approvedGrns = grns.filter(g => g.status === 'Manager Approved');
+            document.getElementById('approved-grn-body').innerHTML = approvedGrns.map(g => `<tr><td>${g.id}</td><td>${g.poId}</td><td>${g.supplier}</td><td>Rs. ${g.totalAmount.toLocaleString()}</td><td><span class="badge badge-success">Ready for Payment</span></td></tr>`).join('') || '<tr><td colspan="5">No GRNs ready for payment</td></tr>';
+        }
+
+        function requestSample() {
+            let supplier = document.getElementById('sample-supplier-name').value, material = document.getElementById('sample-material').value, qty = document.getElementById('sample-qty').value;
+            if (!supplier || !material) { alert('Please fill all fields'); return; }
+            let id = 'SAMP-' + String(sampleRequests.length + 1).padStart(3, '0'), today = new Date().toISOString().split('T')[0];
+            sampleRequests.push({ id, supplier, material, qty: parseInt(qty), requestDate: today, status: 'QC Pending', qcResult: null });
+            alert(`Sample requested from ${supplier} for ${material}`); loadSampleFlowData();
+            document.getElementById('sample-supplier-name').value = ''; document.getElementById('sample-material').value = ''; document.getElementById('sample-qty').value = '';
+        }
+
+        function simulateQC(sampleId, result, remarks, price, qualityScore) {
+            let sample = sampleRequests.find(s => s.id === sampleId);
+            if (sample) { sample.status = 'QC Completed'; sample.qcResult = result; let testDate = new Date().toISOString().split('T')[0]; qcReports.push({ sampleId, supplier: sample.supplier, material: sample.material, testDate, result, remarks, price, qualityScore }); alert(result === 'Pass' ? `✅ Sample ${sampleId} PASSED QC.` : `❌ Sample ${sampleId} REJECTED.`); loadSampleFlowData(); }
+        }
+
+        function sendRejectFeedback(supplier, material, remarks) { alert(`📧 Rejection feedback sent to ${supplier}:\nMaterial: ${material}\nReason: ${remarks}\n\nSupplier has been notified.`); }
+
+        function selectForPO(sampleId) {
+            let qc = qcReports.find(q => q.sampleId === sampleId);
+            if (qc) { document.getElementById('po-supplier').value = qc.supplier; document.getElementById('po-material').value = qc.material; document.getElementById('po-price').value = qc.price || ''; document.getElementById('po-creation-area').style.display = 'block'; document.getElementById('po-creation-area').dataset.selectedSampleId = sampleId; }
+        }
+
+        function createPurchaseOrder() {
+            let sampleId = document.getElementById('po-creation-area').dataset.selectedSampleId, supplier = document.getElementById('po-supplier').value, material = document.getElementById('po-material').value, unitPrice = parseFloat(document.getElementById('po-price').value), qty = parseFloat(document.getElementById('po-qty').value), deliveryDate = document.getElementById('po-delivery-date').value, terms = document.getElementById('po-terms').value;
+            if (!unitPrice || !qty) { alert('Please enter price and quantity'); return; }
+            let poId = 'PO-' + String(purchaseOrders.length + 1).padStart(3, '0'), total = unitPrice * qty;
+            purchaseOrders.push({ id: poId, supplier, material, qty, unitPrice, total, deliveryDate, terms, status: 'Pending Manager Approval', approved: false, sampleId: sampleId });
+            saveDataToStorage(); alert(`PO ${poId} created and sent to Manager for approval!`);
+            if (confirm('PO created. Open Manager Dashboard now to approve?')) goToManagerDashboard();
+            document.getElementById('po-creation-area').style.display = 'none'; loadSampleFlowData();
+        }
+
+        function receiveMaterial(poId) {
+            let po = purchaseOrders.find(p => p.id === poId);
+            if (po && po.approved === true) { document.getElementById('grn-po').value = po.id; document.getElementById('grn-creation-area').style.display = 'block'; document.getElementById('grn-creation-area').dataset.selectedPoId = poId; }
+            else { alert('PO must be approved by Manager before receiving material.'); }
+        }
+
+        function createGRN() {
+            let poId = document.getElementById('grn-creation-area').dataset.selectedPoId, po = purchaseOrders.find(p => p.id === poId), receivedDate = document.getElementById('grn-date').value, receivedQty = parseFloat(document.getElementById('grn-qty').value), inspector = document.getElementById('grn-inspector').value, remarks = document.getElementById('grn-remarks').value;
+            if (!receivedDate || !receivedQty) { alert('Please fill received date and quantity'); return; }
+            let grnId = 'GRN-' + String(grns.length + 1).padStart(3, '0');
+            grns.push({ id: grnId, poId: po.id, supplier: po.supplier, material: po.material, orderedQty: po.qty, receivedQty: receivedQty, unitPrice: po.unitPrice, totalAmount: receivedQty * po.unitPrice, receivedDate: receivedDate, inspector: inspector, remarks: remarks, status: 'Pending Manager Approval' });
+            saveDataToStorage(); alert(`GRN ${grnId} created and sent to Manager for approval!`);
+            if (confirm('GRN created. Open Manager Dashboard now to approve?')) goToManagerDashboard();
+            document.getElementById('grn-creation-area').style.display = 'none'; loadSampleFlowData();
+        }
+
+        function goToManagerDashboard() { window.location.href = 'managerdashboard.html'; }
+        function logout() { if (confirm('Are you sure you want to logout?')) window.location.reload(); }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            let btns = document.querySelectorAll('.tab-btn');
+            let tabMap = { overview: 0, products: 1, rawmaterial: 2, alerts: 3, stockreport: 4, delivery: 5, fastslow: 6, returns: 7, suppliers: 8, 'supplier-flow': 9 };
+            if (btns[tabMap[tabName]]) btns[tabMap[tabName]].classList.add('active');
+            if (tabName === 'delivery') loadDeliveryStatus();
+            if (tabName === 'fastslow') analyzeVelocity();
+            if (tabName === 'supplier-flow') loadSampleFlowData();
+            if (tabName === 'suppliers') renderActiveSuppliers();
+        }
+
+        window.showTab = showTab; window.updateDeliveryStatus = updateDeliveryStatus; window.addProduct = addProduct; window.addRawMaterial = addRawMaterial; window.reorderProduct = reorderProduct; window.generateStockReport = generateStockReport; window.analyzeVelocity = analyzeVelocity; window.generateReturnReport = generateReturnReport; window.requestSample = requestSample; window.simulateQC = simulateQC; window.sendRejectFeedback = sendRejectFeedback; window.selectForPO = selectForPO; window.createPurchaseOrder = createPurchaseOrder; window.receiveMaterial = receiveMaterial; window.createGRN = createGRN; window.goToManagerDashboard = goToManagerDashboard; window.logout = logout; window.contactSupplier = contactSupplier;
+    </script>
+</body>
+
+</html>
